@@ -1,0 +1,36 @@
+name: Workflow
+
+    on:
+      workflow_dispatch
+      schedule:
+        - cron: "0 0 * * *" #runs at 00:00 UTC everyday
+
+    jobs:
+      build:
+        runs-on: ubuntu-latest
+
+        steps:
+          - name: checkout repo content
+            uses: actions/checkout@v2 # checkout the repository content to github runner.
+
+          - name: setup python
+            uses: actions/setup-python@v2
+            with:
+              python-version: 3.8
+
+          - name: Install python dependencies
+            run: |
+              python -m pip install --upgrade pip
+              pip install -r requirements.txt
+
+          - name: Execute script
+            run: |
+              python main.py
+            env:
+              IMAP_DOMAIN: ${{ secrets.IMAP_DOMAIN }}
+              IMAP_PORT: ${{ secrets.IMAP_PORT }}
+              IMAP_USERNAME: ${{ secrets.IMAP_USERNAME }}
+              IMAP_PASSWORD: ${{ secrets.IMAP_PASSWORD }}
+              INTRANET_USERNAME: ${{ secrets.INTRANET_USERNAME }}
+              INTRANET_PASSWORD: ${{ secrets.INTRANET_PASSWORD }}
+              CERT_EMAIL_SENDER: ${{ secrets.CERT_EMAIL_SENDER }}

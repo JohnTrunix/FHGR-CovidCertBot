@@ -6,8 +6,17 @@
 3. Afterwards it makes a post request to get the cookie for upload the files
 4. It uploads the required data and the Covid-Certificate pdf
 
-## Setup
+## Setup Github Actions
+1. Comming soon...
 ---
+
+
+
+
+
+
+## Setup for local development
+
 
 ### Dependencies
 - Any Python 3.xx Version
@@ -29,9 +38,10 @@ INTRANET_PASSWORD = "password"
 # Email from the sender of the Covid-Certificate
 CERT_EMAIL_SENDER = '"noreply@2weeks.ch"'
 ```
-## Setup Github Actions
-1. Comming soon...
----
+### Run
+```.cmd
+python3 main.py
+```
 ## Contributions and Issues
 Feel free to make any contributions or open issues if you have some troubles.
 
