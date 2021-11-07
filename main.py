@@ -77,11 +77,11 @@ def get_certificate_url_from_mail():
 def download_pdf(url):
     r = requests.get(url, allow_redirects=True)
 
-    if r.status_code == 200:
-        open("certificate.pdf", "wb").write(r.content)
-        print("Successfully downloaded Certificate file.")
-    else:
-        sys.exit("Certificate download failed!")
+    if '<!DOCTYPE html>' in str(r.content) or r.status_code != 200:
+        sys.exit("Certificate download failed.")
+
+    open("certificate.pdf", "wb").write(r.content)
+    print("Successfully downloaded Certificate file.")
 
 
 # Extracting Test Date from Certificate
