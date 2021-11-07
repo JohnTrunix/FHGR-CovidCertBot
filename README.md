@@ -13,6 +13,7 @@
 3. You can trigger the workflow manually by going to Actions -> Workflow -> Run workflow -> Run workflow
 4. You also can adjust the cronjob scheddule here some helpful link [Crontab Guru](https://crontab.guru/)
 
+*Note: The workflow will fail if the Covid certificate download link is expired.*
 <br/>
 
 ---
