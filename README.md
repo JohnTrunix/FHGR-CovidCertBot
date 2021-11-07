@@ -7,14 +7,15 @@
 4. It uploads the required data and the Covid-Certificate pdf
 
 ## Setup Github Actions
-1. Comming soon...
+1. Fork my Repository
+2. Create new secrets like in the example.env file
+   ![Setup Secrets](img/setupsecrets.png "Setup Secrets")
+3. You can trigger the workflow manually by going to Actions -> Workflow -> Run workflow -> Run workflow
+4. You also can adjust the cronjob scheddule here some helpful link [Crontab Guru](https://crontab.guru/)
+
+<br/>
+
 ---
-
-
-
-
-
-
 ## Setup for local development
 
 
@@ -36,7 +37,7 @@ INTRANET_USERNAME = "exampleuser"
 INTRANET_PASSWORD = "password"
 
 # Email from the sender of the Covid-Certificate
-CERT_EMAIL_SENDER = '"noreply@2weeks.ch"'
+CERT_EMAIL_SENDER = noreply@2weeks.ch
 ```
 ### Run
 ```.cmd
