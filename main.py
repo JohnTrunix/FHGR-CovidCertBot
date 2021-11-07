@@ -1,4 +1,5 @@
 import os
+import sys
 from dotenv import load_dotenv
 import email
 import imaplib
@@ -6,8 +7,10 @@ import re
 import requests
 import pdfplumber
 
+# Load variables from .env file
 load_dotenv()
 
+# .env Variables
 IMAP_DOMAIN = os.getenv("IMAP_DOMAIN")
 IMAP_PORT = os.getenv("IMAP_PORT")
 IMAP_USERNAME = os.getenv("IMAP_USERNAME")
@@ -19,10 +22,28 @@ INTRANET_PASSWORD = os.getenv("INTRANET_PASSWORD")
 CERT_EMAIL_SENDER = os.getenv("CERT_EMAIL_SENDER")
 
 
-imap = imaplib.IMAP4_SSL(IMAP_DOMAIN, IMAP_PORT)
-status, response = imap.login(IMAP_USERNAME, IMAP_PASSWORD)
+# IMAP connection
+try:
+    imap = imaplib.IMAP4_SSL(IMAP_DOMAIN, IMAP_PORT)
+except Exception as e:
+    sys.exit("IMAP Server error: " + e)
 
 
+# Login for IMAP Server
+def email_login(IMAP_DOMAIN, IMAP_PORT, IMAP_USERNAME, IMAP_PASSWORD):
+    try:
+        status, response = imap.login(IMAP_USERNAME, IMAP_PASSWORD)
+    except Exception as e:
+        sys.exit("IMAP login error: " + e)
+
+
+# Logout from IMAP Server
+def email_logout():
+    imap.close()
+    imap.logout()
+
+
+# Searchs for the Certificate Download URL
 def get_certificate_url_from_mail():
     status, response = imap.select("INBOX")
     status, response = imap.search(None, "FROM", CERT_EMAIL_SENDER)
@@ -44,19 +65,26 @@ def get_certificate_url_from_mail():
             )
 
             if match == None:
-                return print("No URL in Message found!")
+                sys.exit("No file URL in email message found!")
 
             url = match.group(0)
 
-            print("File URL found: " + url)
+            print("Certificate file URL found.")
             return url
 
 
+# Downloads Certificate via URL
 def download_pdf(url):
     r = requests.get(url, allow_redirects=True)
-    open("certificate.pdf", "wb").write(r.content)
+
+    if r.status_code == 200:
+        open("certificate.pdf", "wb").write(r.content)
+        print("Successfully downloaded Certificate file.")
+    else:
+        sys.exit("Certificate download failed!")
 
 
+# Extracting Test Date from Certificate
 def extract_date_from_pdf(file_path):
     with pdfplumber.open(file_path) as pdf:
         pdf_content = pdf.pages[0].extract_text()
@@ -64,11 +92,14 @@ def extract_date_from_pdf(file_path):
         match = re.search(
             "([0-9A-Z]* Datum und Zeit der )(.[.0-9]+)", pdf_content)
 
+        if match == None:
+            sys.exit("No valid timestamp in certificate found!")
+
         timestamp = match.group(2)
-        print(timestamp)
         return timestamp
 
 
+# Login POST request for FHGR Intranet
 def intranet_login(username, password):
     headers = {"content-type": "application/x-www-form-urlencoded"}
     data = "user=" + username + "&pass=" + password + "&logintype=login"
@@ -80,10 +111,29 @@ def intranet_login(username, password):
     match = re.search("(fe_typo_user=[0-9a-z]*)", r.headers["set-cookie"])
     session_token = match.group(1)
 
-    print("Got Session Token: " + session_token)
+    if not session_token:
+        sys.exit("Login failed! No session token received!")
+
+    print("Intranet login successful.")
     return session_token
 
 
+# Logout POST request for FHGR Intranet
+def intranet_logout():
+    data = "logintype=logout"
+    r = requests.post("https://my.fhgr.ch/index.php?id=home", data=data)
+
+    if r.status_code == 200:
+        print("Intranet logout successful.")
+    else:
+        sys.exit("Intranet Logout failed!")
+
+
+# Upload POST request for uploading:
+# - typ -> 2 = "Betriebstest der FH Graubünden"
+# - date -> Test Date (is in certificate.pdf)
+# - result -> 1 = negative, 0 = positive
+# - certificate -> pdf File
 def upload_pdf(session_token, typ, date, result, file_path):
     headers = {"Cookie": session_token}
     data = {
@@ -97,18 +147,25 @@ def upload_pdf(session_token, typ, date, result, file_path):
         "https://my.fhgr.ch/index.php?id=home", headers=headers, data=data
     )
 
-    print(r.status_code)
+    if r.status_code == 200:
+        print("Certificate file upload successful.")
+    else:
+        sys.exit("Certificate file upload failed!")
 
 
-url = get_certificate_url_from_mail()
-download_pdf(url)
-timestamp = extract_date_from_pdf("./certificate.pdf")
-session_token = intranet_login(INTRANET_USERNAME, INTRANET_PASSWORD)
-upload_pdf(session_token, "2", timestamp, "1", 'certificate.pdf')
+# Function calls
+def main():
+    print("Starting...")
+    email_login(IMAP_DOMAIN, IMAP_PORT, IMAP_USERNAME, IMAP_PASSWORD)
+    url = get_certificate_url_from_mail()
+    email_logout()
+    download_pdf(url)
+    timestamp = extract_date_from_pdf("./certificate.pdf")
+    session_token = intranet_login(INTRANET_USERNAME, INTRANET_PASSWORD)
+    upload_pdf(session_token, "2", timestamp, "1", 'certificate.pdf')
+    intranet_logout()
+    print("Job successfully finished!")
 
 
-# In Funktion einbauen
-status = imap.close()
-print(status)
-status = imap.logout()
-print(status)
+if __name__ == "__main__":
+    main()
