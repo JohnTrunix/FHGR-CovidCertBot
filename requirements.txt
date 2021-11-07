@@ -1,2 +1,3 @@
 python-dotenv==0.19.1
 pdfplumber==0.5.28
+requests==2.26.0
