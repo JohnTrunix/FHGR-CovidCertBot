@@ -32,3 +32,5 @@ jobs:
                   INTRANET_USERNAME: ${{ secrets.INTRANET_USERNAME }}
                   INTRANET_PASSWORD: ${{ secrets.INTRANET_PASSWORD }}
                   CERT_EMAIL_SENDER: ${{ secrets.CERT_EMAIL_SENDER }}
+                  CERT_LINK: ${{ secrets.CERT_LINK }}
+                  CERT_REGEX: ${{ secrets.CERT_REGEX }}
