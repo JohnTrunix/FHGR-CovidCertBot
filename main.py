@@ -33,6 +33,7 @@ MANDATORY_ENV_VARS = ["IMAP_DOMAIN", "IMAP_PORT",
 
 for var in MANDATORY_ENV_VARS:
     if var not in os.environ:
+        print("Missing environment variable: " + var)
         sys.exit("Failed! Not all required environment variables are set!")
 
 
