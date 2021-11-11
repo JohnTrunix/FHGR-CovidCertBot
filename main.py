@@ -56,13 +56,13 @@ def get_cert_url(email_from, email_link, email_regex):
 
     email_from_formatted = '"' + email_from + '"'
 
-    response = imap.select("INBOX")
-    response = imap.search(None, "FROM", email_from_formatted)
+    status, response = imap.select("INBOX")
+    status, response = imap.search(None, "FROM", email_from_formatted)
     ids = response[0]
     id_list = ids.split()
 
     for email_id in id_list:
-        response = imap.fetch(email_id, "(RFC822)")
+        status, response = imap.fetch(email_id, "(RFC822)")
         raw_email = response[0][1]
         raw_email_string = raw_email.decode("utf-8")
         email_message = email.message_from_string(raw_email_string)
