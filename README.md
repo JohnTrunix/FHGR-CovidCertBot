@@ -1,4 +1,9 @@
 # FHGR-CovidCertBot
+[![Workflow](https://github.com/JohnTrunix/FHGR-CovidCertBot/actions/workflows/workflow.yaml/badge.svg)](https://github.com/JohnTrunix/FHGR-CovidCertBot/actions/workflows/workflow.yaml)
+[![made-with-python](https://img.shields.io/badge/Made%20with-Python-1f425f.svg)](https://www.python.org/)
+![GitHub](https://img.shields.io/github/license/JohnTrunix/FHGR-CovidCertBot)
+
+
 ## Functions
 ---
 1. The CovidCertBot is designed for Github Actions. First it will scan your defined imap Email Inbox and look for a new Covid-Certificate.
@@ -34,11 +39,15 @@ IMAP_USERNAME = exampleuser
 IMAP_PASSWORD= password
 
 # Intranet setup
-INTRANET_USERNAME = "exampleuser"
-INTRANET_PASSWORD = "password"
+INTRANET_USERNAME = exampleuser
+INTRANET_PASSWORD = password
 
 # Email from the sender of the Covid-Certificate
 CERT_EMAIL_SENDER = noreply@2weeks.ch
+
+# Default link for the certificate
+CERT_LINK = https://my.easytesting.ch/api/cert/
+CERT_REGEX = https?://(my.easytesting.ch/api/cert/)([-a-zA-Z0-9]*)
 ```
 ### Run
 ```.cmd
