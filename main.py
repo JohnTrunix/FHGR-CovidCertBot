@@ -101,12 +101,13 @@ def extract_date_from_pdf(file_path):
         pdf_content = pdf.pages[0].extract_text()
 
         match = re.search(
-            "([0-9A-Z]* Datum und Zeit der )(.[.0-9]+)", pdf_content)
+            "(Datum und Zeit der  )(.[.0-9]+)", pdf_content)
 
         if match is None:
             sys.exit("No valid timestamp in certificate found!")
 
         timestamp = match.group(2)
+        print(timestamp)
         return timestamp
 
 
